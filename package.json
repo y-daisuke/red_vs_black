@@ -1,0 +1,22 @@
+{
+  "name": "redvsblack",
+  "version": "0.0.0",
+  "description": "redvsblack",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "~3.9.1",
+    "gulp-typescript": "~2.12.1",
+    "gulp-sourcemaps": "~1.6.0",
+    "gulp-babel": "~6.1.2",
+    "gulp-rename": "~1.2.2",
+    "gulp-plumber": "~1.1.0",
+    "event-stream": "~3.3.2",
+    "gulp-watch": "~4.3.5",
+    "browser-sync": "~2.11.2"
+  }
+}
