@@ -1,5 +1,7 @@
 ///<reference path="Game.ts"/>
 
 window.onload = () => {
-    var game = new RedVsBlack.Game();
+
+    var game = new Castlevania.Game();
+
 };
