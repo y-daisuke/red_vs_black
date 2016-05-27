@@ -6,6 +6,32 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var RedVsBlack;
 (function (RedVsBlack) {
+    var Card = (function () {
+        function Card(mark, num) {
+            this.mark = mark;
+            this.num = num;
+        }
+        Card.prototype.isBlack = function () {
+            var ret = false;
+            if (this.mark == Card.MARK_SPADE || this.mark == Card.MARK_CLUB) {
+                ret = true;
+            }
+            return ret;
+        };
+        Card.index = function (mark, num) {
+            var ret = 0;
+            ret = (mark * Card.NUM_CARD_MAX) + (num - 1);
+            return ret;
+        };
+        Card.MARK_SPADE = 0;
+        Card.MARK_DIA = 1;
+        Card.MARK_HART = 2;
+        Card.MARK_CLUB = 3;
+        Card.NUM_CARD_MAX = 13;
+        Card.NUM_MARK_MAX = 4;
+        Card.NUM_SPECIAL_CARD_MAX = 4;
+        return Card;
+    }());
     var PlayGame = (function (_super) {
         __extends(PlayGame, _super);
         function PlayGame() {
@@ -69,12 +95,68 @@ var RedVsBlack;
         PlayGame.prototype.update = function () {
             switch (this.state) {
                 case PlayGame.STATE_INIT:
+                    this.shuffleAndDeals();
                     break;
                 case PlayGame.STATE_IDLE:
                     break;
                 default:
                     break;
             }
+        };
+        PlayGame.prototype.shuffleAndDeals = function () {
+            this.initCard();
+            this.dealsCard();
+            this.openCardAll();
+        };
+        PlayGame.prototype.initCard = function () {
+            //this.allcards = new Array((PlayGame.NUM_CARD_MAX*PlayGame.NUM_MARK_MAX)+(PlayGame.NUM_SPECIAL_CARD_MAX));
+            this.allcards = new Array((Card.NUM_CARD_MAX * Card.NUM_MARK_MAX));
+            var cnt = 0;
+            for (var i = 0; i < Card.NUM_CARD_MAX; i++) {
+                cnt = Card.index(Card.MARK_SPADE, i + 1);
+                this.allcards[cnt] = new Card(i + 1, Card.MARK_SPADE);
+                cnt = Card.index(Card.MARK_CLUB, i + 1);
+                this.allcards[cnt] = new Card(i + 1, Card.MARK_CLUB);
+                cnt = Card.index(Card.MARK_DIA, i + 1);
+                this.allcards[cnt] = new Card(i + 1, Card.MARK_DIA);
+                cnt = Card.index(Card.MARK_HART, i + 1);
+                this.allcards[cnt] = new Card(i + 1, Card.MARK_HART);
+            }
+        };
+        PlayGame.prototype.shuffle = function (array) {
+            var n = array.length;
+            var retarray = array.concat();
+            var t;
+            var i;
+            while (n) {
+                i = Math.floor(Math.random() * n--);
+                t = retarray[n];
+                retarray[n] = retarray[i];
+                retarray[i] = t;
+            }
+            return retarray;
+        };
+        PlayGame.prototype.dealsCard = function () {
+            var max = this.allcards.length;
+            this.players_cards = new Array(2);
+            this.players_cards[0] = new Array(max);
+            this.players_cards[1] = new Array(max);
+            this.player1_card_count = 0;
+            this.player2_card_count = 0;
+            var cards = this.shuffle(this.allcards);
+            for (var i = 0; i < max; i++) {
+                if ((i % 2) == 0) {
+                    this.players_cards[0][this.player1_card_count] = cards[i];
+                    this.player1_card_count++;
+                }
+                else {
+                    this.players_cards[1][this.player2_card_count] = cards[i];
+                    this.player2_card_count++;
+                }
+            }
+        };
+        PlayGame.prototype.openCardAll = function () {
+            var ;
         };
         PlayGame.prototype.contains = function (sprite, x, y) {
             var ret = false;

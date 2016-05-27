@@ -1,10 +1,46 @@
 ///<reference path="../lib/phaser.d.ts"/>
 
 module RedVsBlack {    
+    class Card {
+        static MARK_SPADE = 0;
+        static MARK_DIA = 1;
+        static MARK_HART = 2;
+        static MARK_CLUB = 3;
 
+        static NUM_CARD_MAX = 13;
+        static NUM_MARK_MAX = 4;
+        static NUM_SPECIAL_CARD_MAX = 4;
+
+        mark:number;
+        num:number;
+        
+        constructor(mark:number,num:number){
+            this.mark = mark;
+            this.num = num;
+        }
+
+        public isBlack():boolean{
+            var ret = false;
+            if ( this.mark == Card.MARK_SPADE || this.mark == Card.MARK_CLUB )
+            {
+                ret = true;    
+            }
+            return ret;
+        }
+        public static index(mark:number,num:number):number {
+            var ret = 0;
+            ret = (mark * Card.NUM_CARD_MAX) + (num - 1)
+            
+            return ret;
+        }
+        
+    }
+    
     export class PlayGame extends Phaser.State {
         static STATE_IDLE = 0;
         static STATE_INIT = 1;
+        
+        
         
         card_space: Phaser.Sprite[];
         
@@ -14,7 +50,11 @@ module RedVsBlack {
         cardlabel : Phaser.Text[][];
         
         state: number;
-        
+
+        allcards : Card[];
+        players_cards : Card[][];
+        player1_card_count:number;
+        player2_card_count:number;
         
         create() {
             //this.physics.startSystem(Phaser.Physics.ARCADE);
@@ -65,8 +105,8 @@ module RedVsBlack {
                 this.card[1][i].input.enableDrag();
                 this.card[0][i].events.onDragStop.add(this.ondragend, this);
                 this.card[1][i].events.onDragStop.add(this.ondragend, this);
-
             }            
+            
             
 
             this.state = PlayGame.STATE_INIT;
@@ -90,6 +130,7 @@ module RedVsBlack {
         update(){
             switch( this.state) {
             case  PlayGame.STATE_INIT:
+                this.shuffleAndDeals();
                 break;
             case  PlayGame.STATE_IDLE:
                 break;
@@ -98,6 +139,75 @@ module RedVsBlack {
             } 
         }
         
+        shuffleAndDeals(){
+            this.initCard();
+            this.dealsCard();
+            this.openCardAll();            
+        }
+        
+        initCard(){
+            //this.allcards = new Array((PlayGame.NUM_CARD_MAX*PlayGame.NUM_MARK_MAX)+(PlayGame.NUM_SPECIAL_CARD_MAX));
+            this.allcards = new Array((Card.NUM_CARD_MAX*Card.NUM_MARK_MAX));
+            var cnt =0;
+            for ( var i=0;i<Card.NUM_CARD_MAX;i++) {
+                cnt = Card.index(Card.MARK_SPADE,i+1);
+                this.allcards[cnt] = new Card(i+1,Card.MARK_SPADE);
+
+                cnt = Card.index(Card.MARK_CLUB,i+1);
+                this.allcards[cnt] = new Card(i+1,Card.MARK_CLUB);
+
+                cnt = Card.index(Card.MARK_DIA,i+1);
+                this.allcards[cnt] = new Card(i+1,Card.MARK_DIA);
+
+                cnt = Card.index(Card.MARK_HART,i+1);
+                this.allcards[cnt] = new Card(i+1,Card.MARK_HART);
+            }
+            
+        }
+
+        shuffle(array:Card[]):Card[] {
+            var n = array.length;
+            var retarray = array.concat();
+            var t:Card;
+            var i:number;
+
+            while (n) {
+                i = Math.floor(Math.random() * n--);
+                t = retarray[n];
+                retarray[n] = retarray[i];
+                retarray[i] = t;
+            }
+
+            return retarray;
+        }
+        
+        dealsCard(){
+            var max = this.allcards.length;
+            
+            this.players_cards = new Array(2);
+            this.players_cards[0] = new Array(max);
+            this.players_cards[1] = new Array(max);
+
+            this.player1_card_count = 0;
+            this.player2_card_count = 0;
+
+            var cards = this.shuffle(this.allcards);
+            
+            for ( var i=0;i<max;i++){
+                if (( i % 2) == 0 ){
+                    this.players_cards[0][this.player1_card_count] = cards[i];
+                    this.player1_card_count++;            
+                } else {
+                    this.players_cards[1][this.player2_card_count] = cards[i];
+                    this.player2_card_count++;            
+                }
+            }
+        }
+        
+        openCardAll(){
+            var 
+        }        
+
         contains(sprite:Phaser.Sprite,x:number,y:number):boolean {
             var ret = false;
             
@@ -110,6 +220,7 @@ module RedVsBlack {
             }            
             return ret;
         }
+
         containsAll(s1:Phaser.Sprite,s2:Phaser.Sprite):boolean {
             var ret = false;
             
